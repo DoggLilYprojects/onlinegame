@@ -22,47 +22,46 @@ except socket.error as e:
 s.listen(2)
 print("Server started, listening for connection")
 
-players = [
-    Player("Bob", (0,0,255)),
-    Player("Thomas", (255,0,0))
-]
-def thr_client(connection, currentPlayer):
-    connection.send(pickle.dumps(players[currentPlayer]))
+players = dict()
+
+def thr_client(connection):
+    nickname = connection.recv(2048).decode("utf-8")
+    print(f"{nickname} has joined this server")
+    try:
+        connection.send(pickle.dumps(players[nickname]))
+    except:
+        players[nickname] = Player(nickname, (255,0,0))
+        connection.send(pickle.dumps(players[nickname]))
+
     reply = ""
     while True:
         try:
             data = pickle.loads(connection.recv(2048))
+            print(data)
             if not data:
-                '''
+
                 print("No reply")
-                '''
+
                 break
             else:
-                '''
-                print(currentPlayer)
-                '''
-                players[currentPlayer] = data
-                if currentPlayer == 1:
-                    reply = players[0]
-                else:
-                    reply = players[1]
-                '''
+                players[nickname] = data
+
+                reply = {k: v for k, v in players.items() if k != nickname}
+        
                 print("Data: ", data)
-                print("Reply: ", reply)
-                '''
+                                
             connection.sendall(pickle.dumps(reply))
+            print("Reply: ", reply)
+
         except:
-            print(f"{currentPlayer} has disconnected")
+            print(f"{nickname} has disconnected")
             break
 
-    print(f"Connection with {currentPlayer} lost")
+    print(f"Connection with {nickname} lost")
     connection.close()
 
-currentPlayer = 0
 while True:
     connection, address = s.accept()
-    #print("Connected to:", address)
-    print(f"{currentPlayer} joined this server")
+    print("Connected to:", address)
 
-    start_new_thread(thr_client, (connection, currentPlayer))
-    currentPlayer += 1
+    start_new_thread(thr_client, (connection,))
