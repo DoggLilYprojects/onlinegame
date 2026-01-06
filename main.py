@@ -25,6 +25,7 @@ def main():
         window.fill((255, 255, 255))
 
         entities = network.send(player)
+        print(entities)
         if not entities == None:
             for entity in entities:
                 entity.draw(window)

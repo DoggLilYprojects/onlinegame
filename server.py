@@ -46,7 +46,7 @@ def thr_client(connection):
             else:
                 players[nickname] = data
 
-                reply = {k: v for k, v in players.items() if k != nickname}
+                reply = {v for k, v in players.items() if k != nickname}
         
                 print("Data: ", data)
                                 
