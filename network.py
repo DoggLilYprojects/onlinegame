@@ -9,7 +9,7 @@ class Network:
         self.port = 5555
         self.nickname = nickname
         self.obj = self.connect()
-        print(self.obj)
+        #print(self.obj)
 
     def getObject(self):
         return self.obj
